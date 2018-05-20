@@ -1,0 +1,24 @@
+{
+    "name": "ostapiwrapper/ostkit",
+    "description": "Ost php wrapper",
+    "authors": [
+        {
+            "name": "Nguyen Ngoc Luong",
+            "email": "luong@caybua.com"
+        }
+    ],
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.0",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "curl/curl": "*"
+    },
+    "autoload": {
+        "psr-0": {
+          "Ostkit": "src/"
+        }
+    }
+}
