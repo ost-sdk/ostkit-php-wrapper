@@ -31,7 +31,7 @@ $response = $ost->userEdit($user['uuid'], 'Tinh');
 // ... get info by id
 $response = $ost->userRetrieve($user['uuid']); 
 
-$response = $ost->userList(true); // lists all users
+$response = $ost->userList(); // lists all users
 
 ```
 To be continues...
