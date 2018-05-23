@@ -36,14 +36,14 @@ $response = $ost->userList(true); // lists all users
 ```
 To be continues...
 
-##How to run tests
+## How to run tests
 
 In order to test the library:
 
 Create a fork
-Clone the fork to your machine
-Install the depencies `composer install`
-Run the unit tests `./vendor/bin/phpunit tests`
+Clone the fork to your machine 
+Install the depencies `composer install` 
+Run the unit tests `./vendor/bin/phpunit tests` 
 
 
 
