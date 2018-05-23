@@ -14,7 +14,9 @@
         "ext-curl": "*"
     },
     "require-dev": {
-        "curl/curl": "*"
+        "curl/curl": "*",
+        "phpunit/phpunit": "3.7.*",
+        "squizlabs/php_codesniffer": "~2.1"
     },
     "autoload": {
         "psr-0": {

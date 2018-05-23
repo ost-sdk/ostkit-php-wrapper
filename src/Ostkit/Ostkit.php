@@ -4,13 +4,13 @@ use Curl\Curl as Curl;
 
 class Ostkit
 {
-    public $apiUrl = 'https://playgroundapi.ost.com';
+    public $apiUrl = 'https://sandboxapi.ost.com/v1';
     public $apiKey = '';
     public $apiSecret = '';
 
+    protected $curl = '';
 
-
-    public function __construct($apiUrl = '', $apiKey = '', $apiSecret = '')
+    public function __construct($apiKey = '', $apiSecret = '', $apiUrl = '')
     {
         if ($apiUrl != '') {
             $this->apiUrl = $apiUrl;
@@ -21,34 +21,32 @@ class Ostkit
         if ($apiSecret != '') {
             $this->apiSecret = $apiSecret;
         }
+        $this->curl = new Curl();
     }
 
     public function userCreate($name)
     {
-        $endPoint = '/users/create';
-
+        $endPoint = $this->getEndPoint('users');
         $inputParams = [
           'name'=> $name
         ];
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
-        $curl = new Curl();
-        $result = $curl->post($requestParams['requestURL'], $requestParams['inputParams']);
+        
+        $result = $this->curl->post($requestParams['requestURL'], $requestParams['inputParams']);
         return json_decode($result->response, true);
     }
 
 
     public function userEdit($uuid, $name)
     {
-        $endPoint = '/users/edit';
+        $endPoint = $this->getEndPoint('users') . '/' . $uuid;
 
         $inputParams = [
-            'uuid'=> $uuid,
             'name'=> $name
         ];
 
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
-        $curl = new Curl();
-        $result = $curl->post($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->post($requestParams['requestURL'], $requestParams['inputParams']);
 
         return json_decode($result->response, true);
     }
@@ -56,38 +54,38 @@ class Ostkit
     //https://dev.ost.com/docs/api_actions_retrieve.html
     public function userRetrieve($uuid)
     {
-        $endPoint = '/users/' . $uuid;
+        $endPoint = $this->getEndPoint('users') . '/' . $uuid;
 
         $inputParams = [
         ];
 
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
-        $curl = new Curl();
-        $result = $curl->get($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->get($requestParams['requestURL'], $requestParams['inputParams']);
 
         return json_decode($result->response, true);
     }
 
-    public function userList($pageNo = 1, $filter = 'all', $orderBy ='name', $order = 'desc')
+    public function userList($page_no = 1, $airdropped = true, $order_by ='name', $order = 'desc', $optional__filters = 'all', $limit = 10)
     {
-        $endPoint = '/users/list';
+        $endPoint = $this->getEndPoint('users');
         $inputParams = [
             'page_no' => $pageNo,
-            'filter' => $filter,
+            // 'airdropped' => $airdropped,
             'order_by' => $orderBy,
             'order' => $order,
+            'limit' => $limit,
+            'optional__filters' => $optional__filters
         ];
         
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
 
-        $curl = new Curl();
-        $result = $curl->get($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->get($requestParams['requestURL'], $requestParams['inputParams']);
         return json_decode($result->response, true);
     }
 
     public function transactionCreate($name, $kind, $currency_value, $commission_percent, $currency_type = 'USD')
     {
-        $endPoint = '/transaction-types/create';
+        $endPoint = $this->getEndPoint('transactionCreate');
         $inputParams = [
             'name' => $name,
             'kind' => $kind,
@@ -98,15 +96,14 @@ class Ostkit
 
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
 
-        $curl = new Curl();
-        $result = $curl->post($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->post($requestParams['requestURL'], $requestParams['inputParams']);
         return json_decode($result->response, true);
     }
 
 
     public function transactionEdit($client_transaction_id, $name, $kind, $currency_value, $commission_percent, $currency_type = 'USD')
     {
-        $endPoint = '/transaction-types/edit';
+        $endPoint = $this->getEndPoint('transactionEdit');
         $inputParams = [
             'client_transaction_id' => $client_transaction_id,
             'name' => $name,
@@ -118,27 +115,25 @@ class Ostkit
 
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
 
-        $curl = new Curl();
-        $result = $curl->post($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->post($requestParams['requestURL'], $requestParams['inputParams']);
         return json_decode($result->response, true);
     }
 
 
     public function transactionList()
     {
-        $endPoint = '/transaction-types/list';
+        $endPoint = $this->getEndPoint('transactionList');
         $inputParams = [];
         
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
 
-        $curl = new Curl();
-        $result = $curl->get($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->get($requestParams['requestURL'], $requestParams['inputParams']);
         return json_decode($result->response, true);
     }
 
     public function transactionExec($from_uuid, $to_uuid, $transaction_kind)
     {
-        $endPoint = '/transaction-types/execute';
+        $endPoint = $this->getEndPoint('transactionExec');
         $inputParams = [
             'from_uuid' => $from_uuid,
             'to_uuid' => $to_uuid,
@@ -147,27 +142,53 @@ class Ostkit
         
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
 
-        $curl = new Curl();
-        $result = $curl->post($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->post($requestParams['requestURL'], $requestParams['inputParams']);
         return json_decode($result->response, true);
     }
 
 
     public function transactionStatus($transaction_uuids = array())
     {
-        $endPoint = '/transaction-types/status';
+        $endPoint = $this->getEndPoint('transactionStatus');
         $inputParams = [
             'transaction_uuids' => $transaction_uuids,
         ];
         
         $requestParams = $this->getRequestParams($endPoint, $inputParams);
         
-        $curl = new Curl();
-        $result = $curl->post($requestParams['requestURL'], $requestParams['inputParams']);
+        $result = $this->curl->post($requestParams['requestURL'], $requestParams['inputParams']);
         return json_decode($result->response, true);
     }
 
-    public function generateRequestParams($endPoint, $inputParams, $signature, $requestTimestamp)
+
+    protected function getEndPoint($name)
+    {
+        $endPoint = '';
+        switch ($name) {
+            case 'users':
+                $endPoint = '/users';
+                break;
+            case 'transactionCreate':
+                $endPoint = '/transaction-types/create';
+                break;
+            case 'transactionEdit':
+                $endPoint = '/transaction-types/edit';
+                break;
+            case 'transactionList':
+                $endPoint = '/transaction-types/list';
+                break;
+            case 'transactionExec':
+                $endPoint = '/transaction-types/execute';
+                break;
+            case 'transactionStatus':
+                $endPoint = '/transaction-types/status';
+                break;
+        }
+        return $endPoint;
+    }
+
+
+    protected function generateRequestParams($endPoint, $inputParams, $signature, $requestTimestamp)
     {
         $inputParams['api_key'] = $this->apiKey;
         $inputParams['request_timestamp'] = $requestTimestamp;
@@ -178,7 +199,7 @@ class Ostkit
         );
     }
 
-    public function generateQueryString($endPoint, $inputParams, $apiKey, $requestTimestamp)
+    protected function generateQueryString($endPoint, $inputParams, $apiKey, $requestTimestamp)
     {
         $inputParams["api_key"] = $apiKey;
         $inputParams["request_timestamp"] = $requestTimestamp;
@@ -188,13 +209,13 @@ class Ostkit
         return $stringToSign;
     }
 
-    public function generateApiSignature($stringToSign, $apiSecret)
+    protected function generateApiSignature($stringToSign, $apiSecret)
     {
         $hash = hash_hmac('sha256', $stringToSign, $apiSecret);
         return $hash;
     }
 
-    public function getRequestParams($endPoint, $inputParams)
+    protected function getRequestParams($endPoint, $inputParams)
     {
         $requestTimestamp = time();
 
