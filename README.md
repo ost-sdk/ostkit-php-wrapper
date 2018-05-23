@@ -9,7 +9,7 @@ A Branded Token economy must be setup first in order to use the API, see https:/
 
 ## How to install
 ```sh
-composer require ostapiwrapper/ostkit:"dev-master"
+composer require ostkitphpwrapper/ostkit:"dev-master"
 ```
 
 ## How to use the client
