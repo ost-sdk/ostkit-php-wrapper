@@ -1,4 +1,4 @@
-
+![Travis ci](https://api.travis-ci.org/ost-sdk/ostkit-php-wrapper.svg?branch=master)
 # OST KIT - PHP Wrapper for the OST KIT API
 
 A PHP wrapper for the REST API of [OST KIT](https://kit.ost.com) which is currently under active development. This client implements version 0.9.2 of the [OST KIT REST API](https://dev.ost.com).
