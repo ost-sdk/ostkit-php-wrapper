@@ -33,6 +33,15 @@ $response = $ost->userRetrieve($user['uuid']);
 
 $response = $ost->userList(); // lists all users
 
+/* AIRDROPS functions */
+
+/* ACTIONS functions */
+
+/* TRANSACTIONS functions */
+
+/* TRANSFERS functions */
+
+/* TOKEN functions */
 ```
 To be continues...
 

@@ -12,6 +12,10 @@ class OstkitTest extends \PHPUnit_Framework_TestCase
         $this->ostkit = new Ostkit($apikey, $apisecret);
     }
 
+    public function testExtensionLoaded() {
+        $this->assertTrue(extension_loaded('curl'));
+    }
+
     public function testUserCreate() {
         $name = 'Luong';
         $response = $this->ostkit->userCreate($name);
