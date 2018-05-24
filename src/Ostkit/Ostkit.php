@@ -450,8 +450,41 @@ class Ostkit
         return $endPoint;
     }
 
+    public function generateQueryString($endPoint, $inputParams, $requestTimestamp)
+    {
+        $inputParams["api_key"] = $this->apiKey;
+        $inputParams["request_timestamp"] = $requestTimestamp;
+        ksort($inputParams);
+        $stringToSign = $endPoint . '?' . http_build_query($inputParams);
+        // $stringToSign = str_replace('%20', '+', $stringToSign);
+        return $stringToSign;
+    }
 
-    protected function generateRequestParams($endPoint, $inputParams, $signature, $requestTimestamp)
+    public function generateApiSignature($stringToSign)
+    {
+        $hash = hash_hmac('sha256', $stringToSign, $this->apiSecret);
+        return $hash;
+    }
+
+    public function getRequestParams($endPoint, $inputParams, $requestTimestamp = '')
+    {
+        $requestTimestamp = $requestTimestamp != '' ? $requestTimestamp : time();
+
+        $queryString = $this->generateQueryString(
+            $endPoint,
+            $inputParams,
+            $requestTimestamp
+        );
+
+        $signature = $this->generateApiSignature(
+            $queryString
+        );
+        
+        $requestParams = $this->generateRequestParams($endPoint, $inputParams, $signature, $requestTimestamp);
+        return $requestParams;
+    }
+
+    public function generateRequestParams($endPoint, $inputParams, $signature, $requestTimestamp)
     {
         $inputParams['api_key'] = $this->apiKey;
         $inputParams['request_timestamp'] = $requestTimestamp;
@@ -460,41 +493,6 @@ class Ostkit
             'requestURL' => $this->apiUrl . $endPoint,
             'inputParams' => $inputParams
         );
-    }
-
-    protected function generateQueryString($endPoint, $inputParams, $apiKey, $requestTimestamp)
-    {
-        $inputParams["api_key"] = $apiKey;
-        $inputParams["request_timestamp"] = $requestTimestamp;
-        ksort($inputParams);
-        $stringToSign = $endPoint . '?' . http_build_query($inputParams);
-        // $stringToSign = str_replace('%20', '+', $stringToSign);
-        return $stringToSign;
-    }
-
-    protected function generateApiSignature($stringToSign, $apiSecret)
-    {
-        $hash = hash_hmac('sha256', $stringToSign, $apiSecret);
-        return $hash;
-    }
-
-    protected function getRequestParams($endPoint, $inputParams)
-    {
-        $requestTimestamp = time();
-
-        $queryString = $this->generateQueryString(
-            $endPoint,
-            $inputParams,
-            $this->apiKey,
-            $requestTimestamp
-        );
-
-        $signature = $this->generateApiSignature(
-            $queryString,
-            $this->apiSecret
-        );
-        $requestParams = $this->generateRequestParams($endPoint, $inputParams, $signature, $requestTimestamp);
-        return $requestParams;
     }
 }
    

@@ -5,15 +5,45 @@ namespace Ostkit;
 class OstkitTest extends \PHPUnit_Framework_TestCase
 {
     protected $ostkit;
-    
+
+    protected $testParams = '';
+    protected $testQueryString = '';
+    protected $testSignature = '';
     function setUp() {
         $apikey = 'ad7143e1ff8518588bcd';
         $apisecret = '435462fb707d33a6664cb46f947f0b778a8a0fe5d02a2be09f8749e5f78d2281';
         $this->ostkit = new Ostkit($apikey, $apisecret);
+
+        $this->testParams = [
+            '/users',
+            [
+                'name' => 'Luong'
+            ],
+            1527138578
+        ];
+        $this->testQueryString = '/users?api_key=ad7143e1ff8518588bcd&name=Luong&request_timestamp=1527138578';
+        $this->testSignature = '518403dc15e02139e6a6300efb3f491966eff8e262d82805f7a8d897955fedee';
     }
 
     public function testExtensionLoaded() {
         $this->assertTrue(extension_loaded('curl'));
+    }
+
+    public function testGenerateQueryString()
+    {
+        $queryString = $this->ostkit->generateQueryString($this->testParams[0], $this->testParams[1], $this->testParams[2]);
+        $this->assertEquals($queryString, $this->testQueryString);
+    }
+
+
+    public function testGetRequestParams()
+    {
+        $requestParam = $this->ostkit->getRequestParams($this->testParams[0], $this->testParams[1], $this->testParams[2]);
+        $this->assertCount(2, $requestParam);
+        $this->assertCount(4, $requestParam["inputParams"]);
+        $this->assertEquals(array_keys($requestParam), ["requestURL", "inputParams"]);
+        $this->assertEquals(array_keys($requestParam["inputParams"]), ["name", "api_key", "request_timestamp", "signature"]);
+        $this->assertEquals($requestParam["inputParams"]['signature'], $this->testSignature);
     }
 
     public function testUserCreate() {
